@@ -2,7 +2,7 @@
 # Notebook - Iceberg - Nessie Setup
 ###########################################
 
-version: "3"
+version: "3.8"
 
 services:
   # Spark Notebook Server
@@ -12,9 +12,10 @@ services:
     networks:
       iceberg:
     volumes:
-      - ./warehouse:/home/docker/warehouse
-      - ./notebooks:/home/docker/notebooks
-      - ./datasets:/home/docker/datasets
+      #- ./warehouse:/home/docker/warehouse
+      #- ./notebooks:/home/docker/notebooks
+      #- ./datasets:/home/docker/datasets
+      - .:/home/docker/workdir
     environment:
       - AWS_ACCESS_KEY_ID=admin
       - AWS_SECRET_ACCESS_KEY=password
@@ -60,5 +61,117 @@ services:
     container_name: dremio
     networks:
       iceberg:
+
+
+
+
+
+  ###############################################################################
+  # ZooKeeper
+  ###############################################################################
+  zookeeper:
+    # image: bitnami/zookeeper:latest
+    image: confluentinc/cp-zookeeper:7.3.0
+    container_name: zookeeper
+    environment:
+      - ZOOKEEPER_CLIENT_PORT=2181  # <--- MANDATORY FOR CONFLUENT ZOOKEEPER
+    ports:
+      - "2181:2181"
+    networks:
+      - iceberg
+
+  ###############################################################################
+  # Kafka
+  ###############################################################################
+  kafka:
+    # image: bitnami/kafka:latest
+    image: confluentinc/cp-kafka:7.3.0
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181  # <-- REQUIRED!
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=INTERNAL://0.0.0.0:9092,EXTERNAL://0.0.0.0:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL://kafka:9092,EXTERNAL://localhost:9092
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=INTERNAL
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+       # Force internal topic replication factor to 1
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+        reservations:
+          cpus: '1'
+    networks:
+      - iceberg
+
+  ###############################################################################
+  # Flink JobManager
+  ###############################################################################
+  jobmanager:
+    # image: flink:latest
+    image: spycloud_jobmanager
+    container_name: jobmanager
+    hostname: jobmanager
+    command: jobmanager
+    volumes:
+      # - ${PWD}/python_src/flink_basics/flink_basics/jars:/usr/local/flink_host_jars
+      - ${PWD}:/usr/local/workdir
+    ports:
+      - "8081:8081"
+    environment:
+      # You can specify more Flink configurations here as needed
+      - |
+        FLINK_PROPERTIES=jobmanager.rpc.address: jobmanager
+    depends_on:
+      - kafka
+    restart: on-failure
+    networks:
+      - iceberg
+
+  ###############################################################################
+  # Flink TaskManager
+  ###############################################################################
+  taskmanager:
+    # image: flink:latest
+    image: spycloud_jobmanager
+    container_name: taskmanager
+    command: taskmanager
+    depends_on:
+      - jobmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=jobmanager.rpc.address: jobmanager
+    restart: on-failure
+    networks:
+      - iceberg
+
+  # Add this service to your existing docker-compose.yml
+  kafka-ui:
+    container_name: kafka-ui
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - 8380:8080
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=local
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka:9092
+      - KAFKA_CLUSTERS_0_ZOOKEEPER=zookeeper:2181
+    depends_on:
+      - kafka
+      - zookeeper
+    networks:
+      - iceberg
+
 networks:
   iceberg:
+    driver: bridge

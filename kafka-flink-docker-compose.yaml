@@ -1,0 +1,77 @@
+version: "3.8"
+
+services:
+  ###############################################################################
+  # ZooKeeper
+  ###############################################################################
+  zookeeper:
+    image: bitnami/zookeeper:latest
+    container_name: zookeeper
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    ports:
+      - "2181:2181"
+    networks:
+      - flink-kafka-network
+
+  ###############################################################################
+  # Kafka
+  ###############################################################################
+  kafka:
+    image: bitnami/kafka:latest
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=INTERNAL://:29092,EXTERNAL://:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL://kafka:29092,EXTERNAL://localhost:9092
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=INTERNAL
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    networks:
+      - flink-kafka-network
+
+  ###############################################################################
+  # Flink JobManager
+  ###############################################################################
+  jobmanager:
+    image: flink:latest
+    container_name: jobmanager
+    hostname: jobmanager
+    command: jobmanager
+    ports:
+      - "8081:8081"
+    environment:
+      # You can specify more Flink configurations here as needed
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+    depends_on:
+      - kafka
+    networks:
+      - flink-kafka-network
+
+  ###############################################################################
+  # Flink TaskManager
+  ###############################################################################
+  taskmanager:
+    image: flink:latest
+    container_name: taskmanager
+    command: taskmanager
+    depends_on:
+      - jobmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+    networks:
+      - flink-kafka-network
+
+networks:
+  flink-kafka-network:
+    driver: bridge

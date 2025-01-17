@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "kafka_test"
+version = "0.1.0"
+description = ""
+authors = ["Halil Agin <halil.agin@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11, <3.12"
+pyyaml = "^6.0.2"
+jupyter = "^1.1.1"
+kafka-python = "^2.0.2"
+confluent-kafka = "^2.7.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
