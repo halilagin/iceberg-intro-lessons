@@ -32,7 +32,7 @@ def main():
     # 5) Build a KafkaSink
     kafka_sink = (
         KafkaSink.builder()
-        .set_bootstrap_servers("kafka:9092")
+        .set_bootstrap_servers("kafka1:9092")
         .set_record_serializer(
             KafkaRecordSerializationSchema.builder()
             .set_topic("sensor-data")

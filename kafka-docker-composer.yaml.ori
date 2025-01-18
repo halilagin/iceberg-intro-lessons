@@ -102,7 +102,7 @@ services:
       - zoo2
       - zoo3
   jobmanager:
-    image: spycloud_flink 
+    image: spycloud_jobmanager 
     container_name: jobmanager
     command: jobmanager 
     deploy:
@@ -129,18 +129,24 @@ services:
     ports:
     - 8081:8081
   taskmanager:
-    #image: flink:1.17.2-scala_2.12
-    image: spycloud_flink 
+    image: spycloud_jobmanager 
     container_name: taskmanager
     depends_on:
       - jobmanager
-    command: taskmanager
-    scale: 1
+    command: taskmanager 
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 8G
+        reservations:
+          cpus: '2'
+          memory: 4G
+
     environment:
-      - |
-        FLINK_PROPERTIES=
-        jobmanager.rpc.address: jobmanager
-        taskmanager.numberOfTaskSlots: 16
+    - |
+      FINK_PROPERTIES=
+      jobmanager.rpc.address: jobmanager
   sql-client:
     image: spycloud_jobmanager 
     container_name: flink-sql-client
