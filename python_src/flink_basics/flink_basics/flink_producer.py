@@ -94,7 +94,7 @@ def main():
     #.set_bootstrap_servers("172.22.0.7:9092,kafka2:9093,kafka3:9094") \
     #.set_bootstrap_servers("host.docker.internal:29092,host.docker.internal:29093,host.docker.internal:29094") \
     sink = KafkaSink.builder() \
-        .set_bootstrap_servers("kafka1:29092") \
+        .set_bootstrap_servers("kafka1:9092") \
         .set_record_serializer(kafka_record_serializer)\
         .set_delivery_guarantee(DeliveryGuarantee.AT_LEAST_ONCE) \
         .build()

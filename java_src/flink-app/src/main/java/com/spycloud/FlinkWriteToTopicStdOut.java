@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FlinkDataProducer {
+public class FlinkWriteToTopicStdOut {
 
     public static void main(String[] args) throws Exception {
         // 1. Setup Flink environment
@@ -30,7 +30,7 @@ public class FlinkDataProducer {
         // 4. Configure Kafka serialization
         KafkaRecordSerializationSchema<String> recordSerializer =
             KafkaRecordSerializationSchema.<String>builder()
-                .setTopic("sensor-data")
+                .setTopic("std-out")
                 .setValueSerializationSchema(new SimpleStringSchema())
                 .build();
 

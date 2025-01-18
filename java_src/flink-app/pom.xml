@@ -97,9 +97,9 @@
               <shadedArtifactAttached>true</shadedArtifactAttached>
               <shadedClassifierName>fat</shadedClassifierName>
               <transformers>
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                  <mainClass>com.spycloud.FlinkDataProducer</mainClass>
-                </transformer>
+                <!-- <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>com.spycloud.FlinkKafkaProducer</mainClass>
+                </transformer> -->
                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
               </transformers>
               <artifactSet>
