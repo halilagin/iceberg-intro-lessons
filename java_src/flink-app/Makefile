@@ -12,3 +12,9 @@ f_write_to_sensor_data:
 	docker exec jobmanager flink run -c com.spycloud.FlinkWriteToTopicSensorData -d /usr/local/workdir/java_src/flink-app/target/flink-app-1.0-SNAPSHOT-fat.jar
 f_fr_sensor_data_to_std_out:
 	docker exec jobmanager flink run -c com.spycloud.FlinkKafkaTopicRedirector -d /usr/local/workdir/java_src/flink-app/target/flink-app-1.0-SNAPSHOT-fat.jar
+f_print_std_out:
+	java -cp   /usr/local/workdir/java_src/flink-app/target/flink-app-1.0-SNAPSHOT-fat.jar com.spycloud.FlinkPrintKafkaTopicStdOut
+
+
+p:
+	mvn clean package

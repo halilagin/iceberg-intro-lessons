@@ -13,7 +13,7 @@ import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsIni
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.datastream.DataStream;
 
-public class FlinkPrintKafkaTopic {
+public class FlinkPrintKafkaTopicStdOut {
 
     public static void main(String[] args) throws Exception {
         // 1. Create Stream Execution Environment
@@ -21,9 +21,9 @@ public class FlinkPrintKafkaTopic {
 
         // 2. Create Kafka Source
         KafkaSource<String> kafkaSource = KafkaSource.<String>builder()
-            .setBootstrapServers("kafka1:29092,kafka2:29093,kafka3:29094")
+            .setBootstrapServers("kafka1:9092,kafka:9093,kafka3:9094")
             .setTopics("std-out")
-            .setGroupId("flink-consumer-group")
+            .setGroupId("stdout-consumer-group")
             .setStartingOffsets(OffsetsInitializer.earliest())
             .setValueOnlyDeserializer(new SimpleStringSchema())
             .build();
@@ -43,7 +43,7 @@ public class FlinkPrintKafkaTopic {
         processedStream.print();
 
         // 6. Execute the job
-        env.execute("Flink Data Consumer");
+        env.execute("StdOut Data Consumer");
     }
 
     // Equivalent of your process_sensor_data function
@@ -55,31 +55,31 @@ public class FlinkPrintKafkaTopic {
             try {
                 JsonObject userData = gson.fromJson(value, JsonObject.class);
 
-                // Prepare result
-                JsonObject result = new JsonObject();
-                result.addProperty("user_id", userData.get("id").getAsString());
+                // // Prepare result
+                // JsonObject result = new JsonObject();
+                // result.addProperty("user_id", userData.get("id").getAsString());
 
-                String fullName = userData.get("name").getAsString() 
-                                  + " " 
-                                  + userData.get("surname").getAsString();
-                result.addProperty("full_name", fullName);
+                // String fullName = userData.get("name").getAsString() 
+                //                   + " " 
+                //                   + userData.get("surname").getAsString();
+                // result.addProperty("full_name", fullName);
 
-                double salary = userData.get("salary").getAsDouble();
-                String salaryCategory;
-                if (salary > 80000) {
-                    salaryCategory = "High";
-                } else if (salary > 50000) {
-                    salaryCategory = "Medium";
-                } else {
-                    salaryCategory = "Low";
-                }
-                result.addProperty("salary_category", salaryCategory);
-                result.addProperty("salary", salary);
+                // double salary = userData.get("salary").getAsDouble();
+                // String salaryCategory;
+                // if (salary > 80000) {
+                //     salaryCategory = "High";
+                // } else if (salary > 50000) {
+                //     salaryCategory = "Medium";
+                // } else {
+                //     salaryCategory = "Low";
+                // }
+                // result.addProperty("salary_category", salaryCategory);
+                // result.addProperty("salary", salary);
 
-                result.addProperty("job", userData.get("job").getAsString());
-                result.addProperty("company", userData.get("company").getAsString());
+                // result.addProperty("job", userData.get("job").getAsString());
+                // result.addProperty("company", userData.get("company").getAsString());
 
-                return gson.toJson(result);
+                return gson.toJson(userData);
 
             } catch (JsonSyntaxException | IllegalStateException e) {
                 // Return error JSON if parsing fails or fields are missing
