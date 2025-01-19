@@ -102,7 +102,12 @@ services:
       - zoo2
       - zoo3
   jobmanager:
-    image: spycloud_flink 
+    build:
+      context: .
+      dockerfile: Dockerfile.jobmanager
+      platforms:
+      - "linux/amd64"
+    image: spycloud_flink
     container_name: jobmanager
     command: jobmanager 
     deploy:
@@ -129,6 +134,11 @@ services:
     ports:
     - 8081:8081
   taskmanager:
+    build:
+      context: .
+      dockerfile: Dockerfile.jobmanager
+      platforms:
+      - "linux/amd64"
     #image: flink:1.17.2-scala_2.12
     image: spycloud_flink 
     container_name: taskmanager

@@ -4,9 +4,9 @@
 
 
 dup:
-	docker-compose up -d
+	docker compose -f kafka-docker-composer.yaml  up -d
 ddown:
-	docker-compose down
+	docker compose -f kafka-docker-composer.yaml  down
 
 build_spycloud_flink:
 	docker build -f Dockerfile.jobmanager --platform linux/amd64 -t spycloud_flink .

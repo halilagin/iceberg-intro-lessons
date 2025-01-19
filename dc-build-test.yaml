@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  jobmanager:
+    image: spycloud_flink2
+    build:
+      context: .
+      dockerfile: Dockerfile.jobmanager
+    container_name: jobmanager
+    command: jobmanager 
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '1'
+          memory: 1G
+    environment:
+    - |
+      FLINK_PROPERTIES=
+      jobmanager.rpc.address: jobmanager        
+    volumes:
+      # - ${PWD}/python_src/flink_basics/flink_basics/jars:/usr/local/flink_host_jars
+      - ${PWD}:/usr/local/workdir
+      - ./local-flink-conf.yaml:/opt/flink/conf/flink-conf.yaml
+    
+    ports:
+    - 8081:8081
