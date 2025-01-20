@@ -1,4 +1,4 @@
-package com.spycloud;
+package com.spycloud.demo01;
 
 
 
@@ -21,8 +21,8 @@ public class FlinkPrintKafkaTopicStdOut {
 
         // 2. Create Kafka Source
         KafkaSource<String> kafkaSource = KafkaSource.<String>builder()
-            .setBootstrapServers("kafka1:9092,kafka:9093,kafka3:9094")
-            .setTopics("std-out")
+        .setBootstrapServers("host.docker.internal:29092,host.docker.internal:29093,host.docker.internal:29094")
+        .setTopics("std-out")
             .setGroupId("stdout-consumer-group")
             .setStartingOffsets(OffsetsInitializer.earliest())
             .setValueOnlyDeserializer(new SimpleStringSchema())

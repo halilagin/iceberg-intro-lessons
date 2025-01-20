@@ -1,4 +1,4 @@
-package com.spycloud;
+package com.spycloud.demo01;
 
 import com.github.javafaker.Faker;
 import com.google.gson.Gson;
@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FlinkWriteToTopicSensorData {
+public class FlinkWriteToTopicStdOut {
 
     public static void main(String[] args) throws Exception {
         // 1. Setup Flink environment
@@ -30,13 +30,13 @@ public class FlinkWriteToTopicSensorData {
         // 4. Configure Kafka serialization
         KafkaRecordSerializationSchema<String> recordSerializer =
             KafkaRecordSerializationSchema.<String>builder()
-                .setTopic("sensor-data")
+                .setTopic("std-out")
                 .setValueSerializationSchema(new SimpleStringSchema())
                 .build();
 
         // 5. Create Kafka sink
         KafkaSink<String> sink = KafkaSink.<String>builder()
-                .setBootstrapServers("kafka1:29092")
+        .setBootstrapServers("host.docker.internal:29092,host.docker.internal:29093,host.docker.internal:29094")
                 .setRecordSerializer(recordSerializer)
                 .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
                 .build();

@@ -1,4 +1,4 @@
-package com.spycloud;
+package com.spycloud.demo01;
 
 
 
@@ -24,7 +24,7 @@ public class FlinkKafkaTopicRedirector {
 
         // 2. Create Kafka Source
         KafkaSource<String> kafkaSource = KafkaSource.<String>builder()
-            .setBootstrapServers("kafka1:29092,kafka2:29093,kafka3:29094")
+            .setBootstrapServers("host.docker.internal:29092,host.docker.internal:29093,host.docker.internal:29094")
             .setTopics("sensor-data")
             .setGroupId("flink-consumer-group")
             .setStartingOffsets(OffsetsInitializer.earliest())
@@ -44,7 +44,7 @@ public class FlinkKafkaTopicRedirector {
 
          // 4. Define a Kafka Sink
         KafkaSink<String> stdoutSink = KafkaSink.<String>builder()
-        .setBootstrapServers("kafka1:29092,kafka2:29093,kafka3:29094")
+        .setBootstrapServers("host.docker.internal:29092,host.docker.internal:29093,host.docker.internal:29094")
         .setRecordSerializer(
                         KafkaRecordSerializationSchema.builder()
                                 .setTopic("std-out")
