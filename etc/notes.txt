@@ -1,0 +1,1 @@
+https://docs.aws.amazon.com/msk/latest/developerguide/msk-password-tutorial-connect.html
